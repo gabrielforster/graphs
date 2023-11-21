@@ -3,10 +3,11 @@
 #include <stdbool.h>
 #include <string.h>
 
-int** extractEdges(const char *input, int *numPairs) {
+char** extractEdges(const char *input, int *numPairs) {
   int len = strlen(input);
   int count = 0;
 
+  // Count the number of pairs to allocate memory for the matrix
   for (int i = 0; i < len; ++i) {
     if (input[i] == '(') {
       count++;
@@ -16,20 +17,25 @@ int** extractEdges(const char *input, int *numPairs) {
     }
   }
 
-  int **matrix = (int **)malloc(count * sizeof(int *));
+  // Allocate memory for the matrix
+  char **matrix = (char **)malloc(count * sizeof(char *));
   for (int i = 0; i < count; ++i) {
-    matrix[i] = (int *)malloc(2 * sizeof(int));
+    matrix[i] = (char *)malloc(2 * sizeof(char));  // Assuming each element is a single character
   }
 
+  // Extract elements and populate the matrix
   count = 0;
   for (int i = 0; i < len; ++i) {
     if (input[i] == '(') {
       int j = i + 1;
+      // Find the corresponding ")"
       int k = 0;
       while (j < len && input[j] != ')') {
-        if (input[j] >= '0' && input[j] <= '9') {
-          matrix[count][k] = strtol(&input[j], NULL, 10);
+        // Store the characters in the matrix
+        if ((input[j] >= '0' && input[j] <= '9') || (input[j] >= 'a' && input[j] <= 'z') || (input[j] >= 'A' && input[j] <= 'Z')) {
+          matrix[count][k] = input[j];
           k++;
+          // Move the index to the next non-alphanumeric character
           while (j < len && (input[j] == ',' || input[j] == ' ')) {
             j++;
           }
@@ -40,32 +46,38 @@ int** extractEdges(const char *input, int *numPairs) {
     }
   }
 
+  // Set the number of pairs
   *numPairs = count;
 
   return matrix;
 }
 
-int* extractVertices(const char *input, int *numElements) {
+char* extractVertices(const char *input, int *numElements) {
+  // Remove the first and last characters (curly braces)
   char *cleanedInput = strdup(input + 1);
   cleanedInput[strlen(cleanedInput) - 1] = '\0';
 
+  // Count the number of elements
   *numElements = 1;
-  for (int i = 0; input[i] != '\0'; ++i) {
-    if (input[i] == ',') {
+  for (int i = 0; cleanedInput[i] != '\0'; ++i) {
+    if (cleanedInput[i] == ',') {
       (*numElements)++;
     }
   }
 
-  int *result = (int *)malloc(*numElements * sizeof(int));
+  // Allocate memory for the character array
+  char *result = (char *)malloc(*numElements * sizeof(char));
 
+  // Extract elements and populate the array
   int currentIndex = 0;
-  char *token = strtok((char *)cleanedInput, ",");
+  char *token = strtok(cleanedInput, ",");
   while (token != NULL) {
-    printf("token -> %s\n", token);
-    result[currentIndex] = atoi(token);
-    currentIndex++;
+    result[currentIndex++] = token[0];  // Assuming each element is a single character
     token = strtok(NULL, ",");
   }
+
+  // Free memory for the cleaned input
+  free(cleanedInput);
 
   return result;
 }
