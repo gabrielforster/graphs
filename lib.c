@@ -14,6 +14,12 @@ typedef struct {
   int adjacencia_matriz[MAX_VERTICES][MAX_VERTICES];
 } Grafo;
 
+typedef struct pilha {
+  Vertice vertice;
+  int indice;
+  struct pilha *proximo;
+} Pilha;
+
 // Protótipos de Funções
 void inicializar_grafo(Grafo *grafo);
 void adicionar_vertice(Grafo *grafo, Vertice vertice);
@@ -25,7 +31,7 @@ void imprimir_arestas(Grafo *grafo);
 void imprimir_adjacencias(Grafo *grafo);
 void imprimir_adjacencias_vertice(Grafo *grafo, Vertice vertice);
 void imprimir_adjacencias_vertice_indice(Grafo *grafo, int indice);
-int* caminho_simples(Grafo *grafo, Vertice origem, Vertice destino);
+char** caminho_simples(Grafo *grafo, Vertice origem, Vertice destino);
 int* trajeto(Grafo *grafo, Vertice origem, Vertice destino);
 bool eh_conexo(Grafo *grafo);
 
@@ -49,11 +55,11 @@ void adicionar_aresta(Grafo *grafo, Vertice origem, Vertice destino) {
   int indice_destino = -1;
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i], origem) == 0) {
+    if (*grafo->vertices[i] == *origem) {
       indice_origem = i;
     }
 
-    if (strcmp(grafo->vertices[i], destino) == 0) {
+    if (*grafo->vertices[i] == *destino) {
       indice_destino = i;
     }
   }
@@ -83,23 +89,27 @@ void imprimir_adjacencia_matriz(Grafo *grafo) {
 }
 
 void imprimir_vertices(Grafo *grafo) {
-  printf("Vértices:\n");
+  printf("Vértices: ");
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    printf("%s\n", grafo->vertices[i]);
+    printf("%c ", *grafo->vertices[i]);
   }
+
+  printf("\n");
 }
 
 void imprimir_arestas(Grafo *grafo) {
-  printf("Arestas:\n");
+  printf("Arestas: ");
 
   for (int i = 0; i < grafo->arestas; ++i) {
     for (int j = i + 1; j < grafo->arestas; ++j) {
       if (grafo->adjacencia_matriz[i][j] == 1) {
-        printf("%s - %s\n", grafo->vertices[i], grafo->vertices[j]);
+        printf("(%s - %s) ", grafo->vertices[i], grafo->vertices[j]);
       }
     }
   }
+
+  printf("\n");
 }
 
 void imprimir_adjacencias(Grafo *grafo) {
@@ -148,7 +158,7 @@ void imprimir_adjacencias_vertice_indice(Grafo *grafo, int indice) {
   }
 }
 
-int* caminho_simples(Grafo *grafo, Vertice origem, Vertice destino) {
+char** caminho_simples(Grafo *grafo, Vertice origem, Vertice destino) {
   int indice_origem = -1;
   int indice_destino = -1;
 
@@ -162,8 +172,13 @@ int* caminho_simples(Grafo *grafo, Vertice origem, Vertice destino) {
     }
   }
 
+  printf("Origem: %d\n", indice_origem);
+  printf("Destino: %d\n", indice_destino);
+
+  printf("aa");
   if (indice_origem != -1 && indice_destino != -1) {
-    int* caminho = (int*) malloc(grafo->arestas * sizeof(int));
+    printf("alocando");
+    int* trajeto = (int*) malloc(grafo->arestas * sizeof(int));
     int* visitados = (int*) malloc(grafo->arestas * sizeof(int));
     int* pilha = (int*) malloc(grafo->arestas * sizeof(int));
     int topo = -1;
@@ -172,60 +187,53 @@ int* caminho_simples(Grafo *grafo, Vertice origem, Vertice destino) {
       visitados[i] = 0;
     }
 
-    pilha[++topo] = indice_origem;
+    topo++;
+    pilha[topo] = indice_origem;
     visitados[indice_origem] = 1;
 
     while (topo != -1) {
-      int vertice = pilha[topo--];
-      caminho[vertice] = 1;
+      int vertice_atual = pilha[topo];
+      topo--;
 
       for (int i = 0; i < grafo->arestas; ++i) {
-        if (grafo->adjacencia_matriz[vertice][i] == 1 && visitados[i] == 0) {
-          pilha[++topo] = i;
+        if (grafo->adjacencia_matriz[vertice_atual][i] == 1 && visitados[i] == 0) {
+          topo++;
+          pilha[topo] = i;
           visitados[i] = 1;
+          trajeto[i] = vertice_atual;
         }
       }
     }
 
-    free(visitados);
-    free(pilha);
+    if (visitados[indice_destino] == 1) {
+      int* caminho = (int*) malloc(grafo->arestas * sizeof(int));
+      int indice_caminho = 0;
+      int vertice_atual = indice_destino;
 
-    return caminho;
-  }
-
-  return NULL;
-}
-
-int* caminho_simples_indice(Grafo *grafo, int indice_origem, int indice_destino) {
-  if (indice_origem >= 0 && indice_origem < grafo->arestas && indice_destino >= 0 && indice_destino < grafo->arestas) {
-    int* caminho = (int*) malloc(grafo->arestas * sizeof(int));
-    int* visitados = (int*) malloc(grafo->arestas * sizeof(int));
-    int* pilha = (int*) malloc(grafo->arestas * sizeof(int));
-    int topo = -1;
-
-    for (int i = 0; i < grafo->arestas; ++i) {
-      visitados[i] = 0;
-    }
-
-    pilha[++topo] = indice_origem;
-    visitados[indice_origem] = 1;
-
-    while (topo != -1) {
-      int vertice = pilha[topo--];
-      caminho[vertice] = 1;
-
-      for (int i = 0; i < grafo->arestas; ++i) {
-        if (grafo->adjacencia_matriz[vertice][i] == 1 && visitados[i] == 0) {
-          pilha[++topo] = i;
-          visitados[i] = 1;
-        }
+      while (vertice_atual != indice_origem) {
+        caminho[indice_caminho] = vertice_atual;
+        indice_caminho++;
+        vertice_atual = trajeto[vertice_atual];
       }
+
+      printf("cheguei aq 1: ");
+
+      caminho[indice_caminho] = indice_origem;
+      indice_caminho++;
+
+      char** caminho_simples = (char**) malloc(indice_caminho * sizeof(char*));
+
+      printf("cheguei aq 2: ");
+
+      for (int i = 0; i < indice_caminho; ++i) {
+        caminho_simples[i] = (char*) malloc(25 * sizeof(char));
+        strcpy(caminho_simples[i], grafo->vertices[caminho[indice_caminho - i - 1]]);
+      }
+
+      return caminho_simples;
+    } else {
+      return NULL;
     }
-
-    free(visitados);
-    free(pilha);
-
-    return caminho;
   }
 
   return NULL;
