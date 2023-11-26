@@ -38,6 +38,10 @@ void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
 void imprimir_adjacencias(Grafo *grafo);
 void imprimir_adjacencias_vertice(Grafo *grafo, Vertice vertice);
+
+void imprimir_adjacencias_vertice_indice(Grafo *grafo, int indice);
+char** caminho_simples(Grafo *grafo, Vertice origem, Vertice destino);
+int* trajeto(Grafo *grafo, Vertice origem, Vertice destino);
 bool eh_conexo(Grafo *grafo);
 
 void imprimir_caminho(Lista *lista);

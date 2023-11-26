@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
   imprimir_arestas(grafo);
 
   imprimir_adjacencia_matriz(grafo);
-
+  
   printf("Caminho entre A e C: ");
   Lista *lista = acha_caminho(grafo, (Vertice) {'A'}, (Vertice) {'C'});
 

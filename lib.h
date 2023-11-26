@@ -36,6 +36,7 @@ void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
 void imprimir_adjacencias(Grafo *grafo);
 void imprimir_adjacencias_vertice(Grafo *grafo, Vertice vertice);
+
 bool eh_conexo(Grafo *grafo);
 
 void imprimir_caminho(Lista *lista);
