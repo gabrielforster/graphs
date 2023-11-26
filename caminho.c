@@ -42,7 +42,7 @@ int main(int argc, char *argv[]) {
 
   Lista* lista = acha_caminho_bfs(grafo, argv[3], argv[4]);
 
-  printf("Caminho entre %s e %s usando bfs: ", argv[3], argv[4]);
+  printf("Caminho entre %s e %s: ", argv[3], argv[4]);
   if (lista == NULL) {
     printf("Caminho não encontrado\n");
     return 0;
