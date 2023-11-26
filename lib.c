@@ -35,11 +35,6 @@ typedef struct fila {
   Node *ultimo;
 } Fila;
 
-typedef struct {
-  int data[MAX_VERTICES];
-  int front, rear;
-} Queue;
-
 void push(Pilha *pilha, int vertice);
 int pop(Pilha *pilha);
 
@@ -99,71 +94,6 @@ int dequeue(Fila* fila) {
   return vertice;
 }
 
-void init_queue(Queue* q) {
-  q->front = q->rear = -1;
-}
-
-void enqueue2(Queue *q, int value) {
-  if (q->rear == MAX_VERTICES - 1) {
-    printf("Queue is full.\n");
-    return;
-  }
-
-  if (q->front == -1) {
-    q->front = 0;
-  }
-
-  q->rear++;
-  q->data[q->rear] = value;
-}
-
-int dequeue2(Queue *q) {
-  if (q->front == -1) {
-    printf("Queue is empty.\n");
-    return -1;
-  }
-
-  int value = q->data[q->front];
-
-  if (q->front == q->rear) {
-    q->front = -1;
-    q->rear = -1;
-  } else {
-    q->front++;
-  }
-
-  return value;
-}
-
-bool bfs_shortest_path(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, int* path, int* path_length) {
-  bool visited[MAX_VERTICES] = {false};
-  int distance[MAX_VERTICES] = {0};
-  Queue q;
-  init_queue(&q);
-
-  visited[start] = true;
-  enqueue2(&q, start);
-
-  while (q.front != -1) {
-    int current = dequeue2(&q);
-    path[(*path_length)++] = current;
-
-    if (current == end) {
-      return true;
-    }
-
-    for (int i = 0; i < MAX_VERTICES; ++i) {
-      if (adj_matrix[current][i] && !visited[i]) {
-        visited[i] = true;
-        distance[i] = distance[current] + 1;  // Update the distance
-        enqueue2(&q, i);
-      }
-    }
-  }
-
-  return false; // No path found
-}
-
 bool bfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, int* path, int* path_length) {
   bool visited[MAX_VERTICES] = {false};
   Fila fila;
@@ -195,17 +125,14 @@ bool bfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, int* pa
 void inicializar_grafo(Grafo *grafo);
 void adicionar_vertice(Grafo *grafo, const char *label);
 void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino);
-void imprimir_grafo(Grafo *grafo);
 void imprimir_adjacencia_matriz(Grafo *grafo);
 void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
-void imprimir_adjacencias(Grafo *grafo);
 bool eh_conexo(Grafo *grafo);
 bool isomorfo(Grafo *g1, Grafo *g2);
 
 void imprimir_caminho(Lista *lista);
-Lista* acha_caminho(Grafo *grafo, Vertice origem, Vertice destino);
-bool dfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, bool visited[MAX_VERTICES], int path[MAX_VERTICES], int *path_length);
+Lista* acha_caminho_bfs(Grafo *grafo, const char **origem, const char **destino);
 
 void inicializar_grafo(Grafo *grafo) {
   grafo->arestas = 0;
@@ -218,7 +145,6 @@ void inicializar_grafo(Grafo *grafo) {
 }
 
 void adicionar_vertice(Grafo *grafo, const char *label) {
-  printf("Adicionando vértice %s\n", label);
   strcpy(grafo->vertices[grafo->arestas].label, label);
   grafo->arestas++;
 }
@@ -244,13 +170,6 @@ void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino) {
 
   grafo->adjacencia_matriz[indice_origem][indice_destino] = 1;
   grafo->adjacencia_matriz[indice_destino][indice_origem] = 1;
-}
-
-void imprimir_grafo(Grafo *grafo) {
-  printf("Grafo:\n");
-  imprimir_vertices(grafo);
-  imprimir_arestas(grafo);
-  imprimir_adjacencias(grafo);
 }
 
 void imprimir_adjacencia_matriz(Grafo *grafo) {
@@ -294,25 +213,6 @@ void imprimir_arestas(Grafo *grafo) {
   }
 
   printf("\n");
-}
-
-void imprimir_adjacencias(Grafo *grafo) {
-  printf("Adjacências:\n");
-
-  printf("");
-
-  for (int i = 0; i < grafo->arestas; ++i) {
-    printf("%s: ", grafo->vertices[i].label);
-
-    for (int j = 0; j < grafo->arestas; ++j) {
-      if (grafo->adjacencia_matriz[i][j] == 1) {
-        printf("%s\t\t", grafo->vertices[j].label);
-      }
-    }
-
-    printf("\n");
-  }
-
 }
 
 bool eh_conexo(Grafo *grafo) {
@@ -381,59 +281,16 @@ void imprimir_caminho(Lista *caminho) {
   printf("\n");
 }
 
-Lista* acha_caminho(Grafo *grafo, Vertice origem, Vertice destino) {
+Lista* acha_caminho_bfs(Grafo *grafo, const char **origem, const char **destino) {
   int indice_origem = -1;
   int indice_destino = -1;
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i].label, origem.label) == 0) {
+    if (strcmp(grafo->vertices[i].label, origem) == 0) {
       indice_origem = i;
     }
 
-    if (strcmp(grafo->vertices[i].label, destino.label) == 0) {
-      indice_destino = i;
-    }
-  }
-
-  if (indice_origem == -1 || indice_destino == -1) {
-    return NULL;
-  }
-
-  bool visited[MAX_VERTICES] = {false};
-  int path_length = 0;
-  int path[MAX_VERTICES];
-
-  dfs(grafo->adjacencia_matriz, indice_origem, indice_destino, visited, path, &path_length);
-
-  Lista *head, *tail, *aux;
-  
-  for (int i = 0; i < path_length; ++i) {
-    aux = (Lista*) malloc(sizeof(Lista));
-    aux->vertice = grafo->vertices[path[i]];
-    aux->proximo = NULL;
-
-    if (i == 0) {
-      head = aux;
-      tail = aux;
-    } else {
-      tail->proximo = aux;
-      tail = aux;
-    }
-  }
-
-  return head;
-}
-
-Lista* acha_caminho_bfs(Grafo *grafo, Vertice origem, Vertice destino) {
-  int indice_origem = -1;
-  int indice_destino = -1;
-
-  for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i].label, origem.label) == 0) {
-      indice_origem = i;
-    }
-
-    if (strcmp(grafo->vertices[i].label, destino.label) == 0) {
+    if (strcmp(grafo->vertices[i].label, destino) == 0) {
       indice_destino = i;
     }
   }
@@ -465,69 +322,4 @@ Lista* acha_caminho_bfs(Grafo *grafo, Vertice origem, Vertice destino) {
   }
 
   return head;
-}
-Lista* acha_caminho_bfs_short(Grafo *grafo, Vertice origem, Vertice destino) {
-  int indice_origem = -1;
-  int indice_destino = -1;
-
-  for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i].label, origem.label) == 0) {
-      indice_origem = i;
-    }
-
-    if (strcmp(grafo->vertices[i].label, destino.label) == 0) {
-      indice_destino = i;
-    }
-  }
-
-  if (indice_origem == -1 || indice_destino == -1) {
-    return NULL;
-  }
-
-  bool visited[MAX_VERTICES] = {false};
-  int path_length = 0;
-  int path[MAX_VERTICES];
-
-  bfs_shortest_path(grafo->adjacencia_matriz, indice_origem, indice_destino, path, &path_length);
-
-  Lista *head, *tail, *aux;
-  
-  for (int i = 0; i < path_length; ++i) {
-    aux = (Lista*) malloc(sizeof(Lista));
-    aux->vertice = grafo->vertices[path[i]];
-    aux->proximo = NULL;
-
-    if (i == 0) {
-      head = aux;
-      tail = aux;
-    } else {
-      tail->proximo = aux;
-      tail = aux;
-    }
-  }
-
-  return head;
-}
-
-
-bool dfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, bool visited[MAX_VERTICES], int path[MAX_VERTICES], int *path_length) {
-  visited[start] = true;
-  path[(*path_length)++] = start;
-
-  if (start == end) {
-    return true;
-  }
-
-  for (int i = 0; i < MAX_VERTICES; ++i) {
-    if (adj_matrix[start][i] && !visited[i]) {
-      if (dfs(adj_matrix, i, end, visited, path, path_length)) {
-        return true;
-      }
-    }
-  }
-
-  visited[start] = false;
-  (*path_length)--;
-
-  return false;
 }

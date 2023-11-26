@@ -40,5 +40,19 @@ int main(int argc, char *argv[]) {
 
   imprimir_adjacencia_matriz(grafo);
 
+  Lista* lista = acha_caminho_bfs(grafo, argv[3], argv[4]);
+
+  printf("Caminho entre %s e %s usando bfs: ", argv[3], argv[4]);
+  if (lista == NULL) {
+    printf("Caminho não encontrado\n");
+    return 0;
+  } else {
+    while (lista != NULL) {
+      printf("%s ", lista->vertice.label);
+      lista = lista->proximo;
+    }
+    printf("\n");
+  }
+
   return 0;
 }
