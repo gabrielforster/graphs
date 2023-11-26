@@ -254,17 +254,17 @@ void imprimir_grafo(Grafo *grafo) {
 }
 
 void imprimir_adjacencia_matriz(Grafo *grafo) {
-  printf("  ");
+  printf("\t");
   for (int i = 0; i < grafo->arestas; ++i) {
-    printf("%s ", grafo->vertices[i].label);
+    printf("%s\t", grafo->vertices[i].label);
   }
 
   printf("\n");
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    printf("%s ", grafo->vertices[i].label);
+    printf("%s\t", grafo->vertices[i].label);
     for (int j = 0; j < grafo->arestas; ++j) {
-      printf("%d ", grafo->adjacencia_matriz[i][j]);
+      printf("%d\t", grafo->adjacencia_matriz[i][j]);
     }
     printf("\n");
   }
@@ -299,15 +299,20 @@ void imprimir_arestas(Grafo *grafo) {
 void imprimir_adjacencias(Grafo *grafo) {
   printf("Adjacências:\n");
 
+  printf("");
+
   for (int i = 0; i < grafo->arestas; ++i) {
     printf("%s: ", grafo->vertices[i].label);
+
     for (int j = 0; j < grafo->arestas; ++j) {
       if (grafo->adjacencia_matriz[i][j] == 1) {
-        printf("%s ", grafo->vertices[j].label);
+        printf("%s\t\t", grafo->vertices[j].label);
       }
     }
+
     printf("\n");
   }
+
 }
 
 bool eh_conexo(Grafo *grafo) {
