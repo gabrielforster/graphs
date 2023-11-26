@@ -15,12 +15,10 @@ int main(int argc, char *argv[]) {
   }
 
   int numElements;
-  char *vertices = pergar_vertices(argv[1], &numElements);
+  char **vertices = pegar_vertices(argv[1], &numElements);
 
   for (int i = 0; i < numElements; ++i) {
-    Vertice vertice = {vertices[i]};
-
-    adicionar_vertice(grafo, vertice);
+    adicionar_vertice(grafo, vertices[i]);
   }
 
   imprimir_vertices(grafo);
@@ -28,12 +26,10 @@ int main(int argc, char *argv[]) {
   free(vertices);
 
   int numPares;
-  char **arestas = pegar_arestas(argv[2], &numPares);
+  char ***arestas = pegar_arestas(argv[2], &numPares);
 
   for (int i = 0; i < numPares; ++i) {
-    Vertice origem = {arestas[i][0]};
-    Vertice destino = {arestas[i][1]};
-    adicionar_aresta(grafo, origem, destino);
+    adicionar_aresta(grafo, arestas[i][0], arestas[i][1]);
   }
 
   for (int i = 0; i < numPares; ++i)
@@ -41,6 +37,7 @@ int main(int argc, char *argv[]) {
 
   free(arestas);
 
+  imprimir_vertices(grafo);
   imprimir_arestas(grafo);
 
   imprimir_adjacencia_matriz(grafo);
