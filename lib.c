@@ -5,7 +5,9 @@
 
 #define MAX_VERTICES 100
 
-typedef char Vertice[25];
+typedef struct {
+  char label[25];
+} Vertice;
 
 // Estrutura do Grafo
 typedef struct {
@@ -20,6 +22,12 @@ typedef struct pilha {
   struct pilha *proximo;
 } Pilha;
 
+typedef struct lista {
+  Vertice vertice;
+  int indice;
+  struct lista *proximo;
+} Lista;
+
 // Protótipos de Funções
 void inicializar_grafo(Grafo *grafo);
 void adicionar_vertice(Grafo *grafo, Vertice vertice);
@@ -30,10 +38,15 @@ void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
 void imprimir_adjacencias(Grafo *grafo);
 void imprimir_adjacencias_vertice(Grafo *grafo, Vertice vertice);
+
 void imprimir_adjacencias_vertice_indice(Grafo *grafo, int indice);
 char** caminho_simples(Grafo *grafo, Vertice origem, Vertice destino);
 int* trajeto(Grafo *grafo, Vertice origem, Vertice destino);
 bool eh_conexo(Grafo *grafo);
+
+void imprimir_caminho(Lista *lista);
+Lista* acha_caminho(Grafo *grafo, Vertice origem, Vertice destino);
+bool dfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, bool visited[MAX_VERTICES], int path[MAX_VERTICES], int *path_length);
 
 void inicializar_grafo(Grafo *grafo) {
   grafo->arestas = 0;
@@ -46,7 +59,7 @@ void inicializar_grafo(Grafo *grafo) {
 }
 
 void adicionar_vertice(Grafo *grafo, Vertice vertice) {
-  strcpy(grafo->vertices[grafo->arestas], vertice);
+  strcpy(grafo->vertices[grafo->arestas].label, vertice.label);
   grafo->arestas++;
 }
 
@@ -55,19 +68,22 @@ void adicionar_aresta(Grafo *grafo, Vertice origem, Vertice destino) {
   int indice_destino = -1;
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    if (*grafo->vertices[i] == *origem) {
+    if (strcmp(grafo->vertices[i].label, origem.label) == 0) {
       indice_origem = i;
     }
 
-    if (*grafo->vertices[i] == *destino) {
+    if (strcmp(grafo->vertices[i].label, destino.label) == 0) {
       indice_destino = i;
     }
   }
 
-  if (indice_origem != -1 && indice_destino != -1) {
-    grafo->adjacencia_matriz[indice_origem][indice_destino] = 1;
-    grafo->adjacencia_matriz[indice_destino][indice_origem] = 1;
+  if (indice_origem == -1 || indice_destino == -1) {
+    printf("Vértice não encontrado\n");
+    return;
   }
+
+  grafo->adjacencia_matriz[indice_origem][indice_destino] = 1;
+  grafo->adjacencia_matriz[indice_destino][indice_origem] = 1;
 }
 
 void imprimir_grafo(Grafo *grafo) {
@@ -78,21 +94,29 @@ void imprimir_grafo(Grafo *grafo) {
 }
 
 void imprimir_adjacencia_matriz(Grafo *grafo) {
-  printf("Matriz de Adjacência:\n");
+  printf("  ");
+  for (int i = 0; i < grafo->arestas; ++i) {
+    printf("%s ", grafo->vertices[i].label);
+  }
+
+  printf("\n");
 
   for (int i = 0; i < grafo->arestas; ++i) {
+    printf("%s ", grafo->vertices[i].label);
     for (int j = 0; j < grafo->arestas; ++j) {
       printf("%d ", grafo->adjacencia_matriz[i][j]);
     }
     printf("\n");
   }
+
+  printf("\n");
 }
 
 void imprimir_vertices(Grafo *grafo) {
   printf("Vértices: ");
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    printf("%c ", *grafo->vertices[i]);
+    printf("%s ", grafo->vertices[i].label);
   }
 
   printf("\n");
@@ -104,7 +128,7 @@ void imprimir_arestas(Grafo *grafo) {
   for (int i = 0; i < grafo->arestas; ++i) {
     for (int j = i + 1; j < grafo->arestas; ++j) {
       if (grafo->adjacencia_matriz[i][j] == 1) {
-        printf("(%s - %s) ", grafo->vertices[i], grafo->vertices[j]);
+        printf("(%s - %s) ", grafo->vertices[i].label, grafo->vertices[j].label);
       }
     }
   }
@@ -116,10 +140,10 @@ void imprimir_adjacencias(Grafo *grafo) {
   printf("Adjacências:\n");
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    printf("%s: ", grafo->vertices[i]);
+    printf("%s: ", grafo->vertices[i].label);
     for (int j = 0; j < grafo->arestas; ++j) {
       if (grafo->adjacencia_matriz[i][j] == 1) {
-        printf("%s ", grafo->vertices[j]);
+        printf("%s ", grafo->vertices[j].label);
       }
     }
     printf("\n");
@@ -130,165 +154,20 @@ void imprimir_adjacencias_vertice(Grafo *grafo, Vertice vertice) {
   int indice_vertice = -1;
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i], vertice) == 0) {
+    if (strcmp(grafo->vertices[i].label, vertice.label) == 0) {
       indice_vertice = i;
     }
   }
 
   if (indice_vertice != -1) {
-    printf("Adjacências de %s:\n", vertice);
+    printf("Adjacências de %s:\n", vertice.label);
     for (int i = 0; i < grafo->arestas; ++i) {
       if (grafo->adjacencia_matriz[indice_vertice][i] == 1) {
-        printf("%s ", grafo->vertices[i]);
+        printf("%s ", grafo->vertices[i].label);
       }
     }
     printf("\n");
   }
-}
-
-void imprimir_adjacencias_vertice_indice(Grafo *grafo, int indice) {
-  if (indice >= 0 && indice < grafo->arestas) {
-    printf("Adjacências de %s:\n", grafo->vertices[indice]);
-    for (int i = 0; i < grafo->arestas; ++i) {
-      if (grafo->adjacencia_matriz[indice][i] == 1) {
-        printf("%s ", grafo->vertices[i]);
-      }
-    }
-    printf("\n");
-  }
-}
-
-char** caminho_simples(Grafo *grafo, Vertice origem, Vertice destino) {
-  int indice_origem = -1;
-  int indice_destino = -1;
-
-  for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i], origem) == 0) {
-      indice_origem = i;
-    }
-
-    if (strcmp(grafo->vertices[i], destino) == 0) {
-      indice_destino = i;
-    }
-  }
-
-  printf("Origem: %d\n", indice_origem);
-  printf("Destino: %d\n", indice_destino);
-
-  printf("aa");
-  if (indice_origem != -1 && indice_destino != -1) {
-    printf("alocando");
-    int* trajeto = (int*) malloc(grafo->arestas * sizeof(int));
-    int* visitados = (int*) malloc(grafo->arestas * sizeof(int));
-    int* pilha = (int*) malloc(grafo->arestas * sizeof(int));
-    int topo = -1;
-
-    for (int i = 0; i < grafo->arestas; ++i) {
-      visitados[i] = 0;
-    }
-
-    topo++;
-    pilha[topo] = indice_origem;
-    visitados[indice_origem] = 1;
-
-    while (topo != -1) {
-      int vertice_atual = pilha[topo];
-      topo--;
-
-      for (int i = 0; i < grafo->arestas; ++i) {
-        if (grafo->adjacencia_matriz[vertice_atual][i] == 1 && visitados[i] == 0) {
-          topo++;
-          pilha[topo] = i;
-          visitados[i] = 1;
-          trajeto[i] = vertice_atual;
-        }
-      }
-    }
-
-    if (visitados[indice_destino] == 1) {
-      int* caminho = (int*) malloc(grafo->arestas * sizeof(int));
-      int indice_caminho = 0;
-      int vertice_atual = indice_destino;
-
-      while (vertice_atual != indice_origem) {
-        caminho[indice_caminho] = vertice_atual;
-        indice_caminho++;
-        vertice_atual = trajeto[vertice_atual];
-      }
-
-      printf("cheguei aq 1: ");
-
-      caminho[indice_caminho] = indice_origem;
-      indice_caminho++;
-
-      char** caminho_simples = (char**) malloc(indice_caminho * sizeof(char*));
-
-      printf("cheguei aq 2: ");
-
-      for (int i = 0; i < indice_caminho; ++i) {
-        caminho_simples[i] = (char*) malloc(25 * sizeof(char));
-        strcpy(caminho_simples[i], grafo->vertices[caminho[indice_caminho - i - 1]]);
-      }
-
-      return caminho_simples;
-    } else {
-      return NULL;
-    }
-  }
-
-  return NULL;
-}
-
-int* trajeto(Grafo *grafo, Vertice origem, Vertice destino) {
-  int indice_origem = -1;
-  int indice_destino = -1;
-
-  for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i], origem) == 0) {
-      indice_origem = i;
-    }
-
-    if (strcmp(grafo->vertices[i], destino) == 0) {
-      indice_destino = i;
-    }
-  }
-
-  if (indice_origem != -1 && indice_destino != -1) {
-    int* trajeto = (int*) malloc(grafo->arestas * sizeof(int));
-    int* visitados = (int*) malloc(grafo->arestas * sizeof(int));
-    int* pilha = (int*) malloc(grafo->arestas * sizeof(int));
-    int topo = -1;
-
-    for (int i = 0; i < grafo->arestas; ++i) {
-      visitados[i] = 0;
-    }
-
-    pilha[++topo] = indice_origem;
-    visitados[indice_origem] = 1;
-
-    while (topo != -1) {
-      int vertice = pilha[topo--];
-      trajeto[vertice] = 1;
-
-      if (vertice == indice_destino) {
-        break;
-      }
-
-      for (int i = 0; i < grafo->arestas; ++i) {
-        if (grafo->adjacencia_matriz[vertice][i] == 1 && visitados[i] == 0) {
-          pilha[++topo] = i;
-          visitados[i] = 1;
-        }
-      }
-    }
-
-    free(visitados);
-    free(pilha);
-
-    return trajeto;
-  }
-
-  return NULL;
 }
 
 bool eh_conexo(Grafo *grafo) {
@@ -325,4 +204,82 @@ bool eh_conexo(Grafo *grafo) {
   free(visitados);
   free(pilha);
   return true;
+}
+
+void imprimir_caminho(Lista *caminho) {
+  if (caminho == NULL) {
+    printf("Caminho não encontrado\n");
+    return;
+  }
+
+  while (caminho != NULL) {
+    printf("%s ", caminho->vertice.label);
+    caminho = caminho->proximo;
+  }
+  printf("\n");
+}
+
+Lista* acha_caminho(Grafo *grafo, Vertice origem, Vertice destino) {
+  int indice_origem = -1;
+  int indice_destino = -1;
+
+  for (int i = 0; i < grafo->arestas; ++i) {
+    if (strcmp(grafo->vertices[i].label, origem.label) == 0) {
+      indice_origem = i;
+    }
+
+    if (strcmp(grafo->vertices[i].label, destino.label) == 0) {
+      indice_destino = i;
+    }
+  }
+
+  if (indice_origem == -1 || indice_destino == -1) {
+    return NULL;
+  }
+
+  bool visited[MAX_VERTICES] = {false};
+  int path_length = 0;
+  int path[MAX_VERTICES];
+
+  dfs(grafo->adjacencia_matriz, indice_origem, indice_destino, visited, path, &path_length);
+
+  Lista *head, *tail, *aux;
+  
+  for (int i = 0; i < path_length; ++i) {
+    aux = (Lista*) malloc(sizeof(Lista));
+    aux->vertice = grafo->vertices[path[i]];
+    aux->proximo = NULL;
+
+    if (i == 0) {
+      head = aux;
+      tail = aux;
+    } else {
+      tail->proximo = aux;
+      tail = aux;
+    }
+  }
+
+  return head;
+}
+
+bool dfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, bool visited[MAX_VERTICES], int path[MAX_VERTICES], int *path_length) {
+  visited[start] = true;
+  path[(*path_length)++] = start;
+
+  if (start == end) {
+    return true;
+  }
+
+  for (int i = 0; i < MAX_VERTICES; ++i) {
+    if (adj_matrix[start][i] && !visited[i]) {
+      if (dfs(adj_matrix, i, end, visited, path, path_length)) {
+        return true;
+      }
+    }
+  }
+
+  visited[start] = false;
+  (*path_length)--;
+
+  return false;
 }

@@ -1,3 +1,3 @@
-char** extractEdges(const char *input, int *numPairs);
-char* extractVertices(const char *input, int *numElements);
+char** pegar_arestas(const char *input, int *numPairs);
+char* pergar_vertices(const char *input, int *numElements);
 

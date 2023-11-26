@@ -20,9 +20,9 @@ int main(int argc, char *argv[]) {
       char *result = extractVertices(argv[i], &numElements);
 
       for (int i = 0; i < numElements; ++i) {
-        temp_char1 = result[i];
+        Vertice vertice = {result[i]};
 
-        adicionar_vertice(grafo, &temp_char1);
+        adicionar_vertice(grafo, vertice);
       }
 
       imprimir_vertices(grafo);
@@ -33,11 +33,9 @@ int main(int argc, char *argv[]) {
       char **result = extractEdges(argv[2], &numPairs);
 
       for (int i = 0; i < numPairs; ++i) {
-        // TODO FIX: pointer needs to be cleaned? not receiving correct value like A,B C,D
-        // printf("%s %s\n", &result[i][0], &result[i][1]);
-        temp_char1 = result[i][0];
-        temp_char2 = result[i][1];
-        adicionar_aresta(grafo, &temp_char1, &temp_char2);
+        Vertice origem = {result[i][0]};
+        Vertice destino = {result[i][1]};
+        adicionar_aresta(grafo, origem, destino);
       }
 
       for (int i = 0; i < numPairs; ++i)
@@ -50,15 +48,15 @@ int main(int argc, char *argv[]) {
   imprimir_arestas(grafo);
 
   imprimir_adjacencia_matriz(grafo);
+  
+  printf("Caminho entre A e C: ");
+  Lista *lista = acha_caminho(grafo, (Vertice) {'A'}, (Vertice) {'C'});
 
-  // char** caminho = caminho_simples(grafo, "A", "D");
-  //
-  // printf("Caminho: ");
-  //
-  // for (int i = 0; i < grafo->arestas; ++i) {
-  //   printf("%s ", caminho[i]);
-  // }
-  // printf("\n");
+  while (lista != NULL) {
+    printf("%s ", lista->vertice.label);
+    lista = lista->proximo;
+  }
+  printf("\n");
 
   return 0;
 }
