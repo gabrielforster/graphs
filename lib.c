@@ -208,6 +208,10 @@ void imprimir_caminho(Lista *lista);
 Lista* acha_caminho(Grafo *grafo, Vertice origem, Vertice destino);
 bool dfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, bool visited[MAX_VERTICES], int path[MAX_VERTICES], int *path_length);
 
+void imprimir_caminho(Lista *lista);
+Lista* acha_caminho(Grafo *grafo, Vertice origem, Vertice destino);
+bool dfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, bool visited[MAX_VERTICES], int path[MAX_VERTICES], int *path_length);
+
 void inicializar_grafo(Grafo *grafo) {
   grafo->arestas = 0;
 
@@ -523,7 +527,6 @@ Lista* acha_caminho_bfs_short(Grafo *grafo, Vertice origem, Vertice destino) {
 
   return head;
 }
-
 
 bool dfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, bool visited[MAX_VERTICES], int path[MAX_VERTICES], int *path_length) {
   visited[start] = true;
