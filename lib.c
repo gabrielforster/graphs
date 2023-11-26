@@ -193,14 +193,13 @@ bool bfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, int* pa
 
 // Protótipos de Funções
 void inicializar_grafo(Grafo *grafo);
-void adicionar_vertice(Grafo *grafo, Vertice vertice);
-void adicionar_aresta(Grafo *grafo, Vertice origem, Vertice destino);
+void adicionar_vertice(Grafo *grafo, const char *label);
+void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino);
 void imprimir_grafo(Grafo *grafo);
 void imprimir_adjacencia_matriz(Grafo *grafo);
 void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
 void imprimir_adjacencias(Grafo *grafo);
-void imprimir_adjacencias_vertice(Grafo *grafo, Vertice vertice);
 bool eh_conexo(Grafo *grafo);
 bool isomorfo(Grafo *g1, Grafo *g2);
 
@@ -218,21 +217,22 @@ void inicializar_grafo(Grafo *grafo) {
   }
 }
 
-void adicionar_vertice(Grafo *grafo, Vertice vertice) {
-  strcpy(grafo->vertices[grafo->arestas].label, vertice.label);
+void adicionar_vertice(Grafo *grafo, const char *label) {
+  printf("Adicionando vértice %s\n", label);
+  strcpy(grafo->vertices[grafo->arestas].label, label);
   grafo->arestas++;
 }
 
-void adicionar_aresta(Grafo *grafo, Vertice origem, Vertice destino) {
+void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino) {
   int indice_origem = -1;
   int indice_destino = -1;
 
   for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i].label, origem.label) == 0) {
+    if (strcmp(grafo->vertices[i].label, origem) == 0) {
       indice_origem = i;
     }
 
-    if (strcmp(grafo->vertices[i].label, destino.label) == 0) {
+    if (strcmp(grafo->vertices[i].label, destino) == 0) {
       indice_destino = i;
     }
   }
@@ -304,26 +304,6 @@ void imprimir_adjacencias(Grafo *grafo) {
     for (int j = 0; j < grafo->arestas; ++j) {
       if (grafo->adjacencia_matriz[i][j] == 1) {
         printf("%s ", grafo->vertices[j].label);
-      }
-    }
-    printf("\n");
-  }
-}
-
-void imprimir_adjacencias_vertice(Grafo *grafo, Vertice vertice) {
-  int indice_vertice = -1;
-
-  for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i].label, vertice.label) == 0) {
-      indice_vertice = i;
-    }
-  }
-
-  if (indice_vertice != -1) {
-    printf("Adjacências de %s:\n", vertice.label);
-    for (int i = 0; i < grafo->arestas; ++i) {
-      if (grafo->adjacencia_matriz[indice_vertice][i] == 1) {
-        printf("%s ", grafo->vertices[i].label);
       }
     }
     printf("\n");

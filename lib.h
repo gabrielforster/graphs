@@ -32,14 +32,13 @@ typedef struct fila {
 
 // Protótipos de Funções
 void inicializar_grafo(Grafo *grafo);
-void adicionar_vertice(Grafo *grafo, Vertice vertice);
-void adicionar_aresta(Grafo *grafo, Vertice origem, Vertice destino);
+void adicionar_vertice(Grafo *grafo, const char *label);
+void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino);
 void imprimir_grafo(Grafo *grafo);
 void imprimir_adjacencia_matriz(Grafo *grafo);
 void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
 void imprimir_adjacencias(Grafo *grafo);
-void imprimir_adjacencias_vertice(Grafo *grafo, Vertice vertice);
 bool eh_conexo(Grafo *grafo);
 bool isomorfo(Grafo *g1, Grafo *g2);
 
@@ -52,5 +51,5 @@ bool dfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, bool vi
 bool bfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, int* path, int* path_length);
 bool bfs_shortest_path(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, int* path, int* path_length);
 
-char** pegar_arestas(const char *input, int *numPairs);
-char* pergar_vertices(const char *input, int *numElements);
+char*** pegar_arestas(const char *input, int *numPairs);
+char** pegar_vertices(const char *input, int *numElements);
