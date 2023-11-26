@@ -11,8 +11,8 @@ typedef struct {
 
 typedef struct {
   Vertice vertices[MAX_VERTICES];
-  int arestas;
-  int adjacencia_matriz[MAX_VERTICES][MAX_VERTICES];
+  int numero_vertices;
+  int matriz_adjacente[MAX_VERTICES][MAX_VERTICES];
 } Grafo;
 
 typedef struct lista {
@@ -125,7 +125,7 @@ bool bfs(int adj_matrix[MAX_VERTICES][MAX_VERTICES], int start, int end, int* pa
 void inicializar_grafo(Grafo *grafo);
 void adicionar_vertice(Grafo *grafo, const char *label);
 void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino);
-void imprimir_adjacencia_matriz(Grafo *grafo);
+void imprimir_matriz_adjacente(Grafo *grafo);
 void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
 bool eh_conexo(Grafo *grafo);
@@ -136,34 +136,31 @@ Lista* acha_caminho_bfs(Grafo *grafo, const char **origem, const char **destino)
 
 
 void inicializar_grafo(Grafo *grafo) {
-  grafo->arestas = 0;
+  grafo->numero_vertices = 0;
 
   for (int i = 0; i < MAX_VERTICES; ++i) {
     for (int j = 0; j < MAX_VERTICES; ++j) {
-      grafo->adjacencia_matriz[i][j] = 0;
+      grafo->matriz_adjacente[i][j] = 0;
     }
   }
 }
 
 void adicionar_vertice(Grafo *grafo, const char *label) {
-  strcpy(grafo->vertices[grafo->arestas].label, label);
+  strcpy(grafo->vertices[grafo->numero_vertices].label, label);
 
-  grafo->arestas++;
+  grafo->numero_vertices++;
 }
 
 void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino) {
   int indice_origem = -1;
   int indice_destino = -1;
 
-  for (int i = 0; i < grafo->arestas; ++i) {
-    if (strcmp(grafo->vertices[i].label, origem) == 0) {
+  for (int i = 0; i < grafo->numero_vertices; ++i) {
+    if (strcmp(grafo->vertices[i].label, origem) == 0)
       indice_origem = i;
-    }
 
-    if (strcmp(grafo->vertices[i].label, destino) == 0) {
-
+    if (strcmp(grafo->vertices[i].label, destino) == 0)
       indice_destino = i;
-    }
   }
 
   if (indice_origem == -1 || indice_destino == -1) {
@@ -171,23 +168,23 @@ void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino) {
     return;
   }
 
-  grafo->adjacencia_matriz[indice_origem][indice_destino] = 1;
-  grafo->adjacencia_matriz[indice_destino][indice_origem] = 1;
+  grafo->matriz_adjacente[indice_origem][indice_destino] = 1;
+  grafo->matriz_adjacente[indice_destino][indice_origem] = 1;
 }
 
-void imprimir_adjacencia_matriz(Grafo *grafo) {
+void imprimir_matriz_adjacente(Grafo *grafo) {
   printf("\t");
-  for (int i = 0; i < grafo->arestas; ++i) {
+  for (int i = 0; i < grafo->numero_vertices; ++i) {
     printf("%s\t", grafo->vertices[i].label);
   }
 
   printf("\n");
 
-  for (int i = 0; i < grafo->arestas; ++i) {
+  for (int i = 0; i < grafo->numero_vertices; ++i) {
     printf("%s\t", grafo->vertices[i].label);
 
-    for (int j = 0; j < grafo->arestas; ++j) {
-      printf("%d\t", grafo->adjacencia_matriz[i][j]);
+    for (int j = 0; j < grafo->numero_vertices; ++j) {
+      printf("%d\t", grafo->matriz_adjacente[i][j]);
     }
     printf("\n");
   }
@@ -198,7 +195,7 @@ void imprimir_adjacencia_matriz(Grafo *grafo) {
 void imprimir_vertices(Grafo *grafo) {
   printf("Vértices: ");
 
-  for (int i = 0; i < grafo->arestas; ++i) {
+  for (int i = 0; i < grafo->numero_vertices; ++i) {
     printf("%s ", grafo->vertices[i].label);
   }
 
@@ -208,9 +205,9 @@ void imprimir_vertices(Grafo *grafo) {
 void imprimir_arestas(Grafo *grafo) {
   printf("Arestas: ");
 
-  for (int i = 0; i < grafo->arestas; ++i) {
-    for (int j = i + 1; j < grafo->arestas; ++j) {
-      if (grafo->adjacencia_matriz[i][j] == 1) {
+  for (int i = 0; i < grafo->numero_vertices; ++i) {
+    for (int j = i + 1; j < grafo->numero_vertices; ++j) {
+      if (grafo->matriz_adjacente[i][j] == 1) {
         printf("(%s - %s) ", grafo->vertices[i].label, grafo->vertices[j].label);
       }
     }
@@ -220,10 +217,10 @@ void imprimir_arestas(Grafo *grafo) {
 }
 
 bool eh_conexo(Grafo *grafo) {
-  int* visitados = (int*) malloc(grafo->arestas * sizeof(int));
-  Pilha* pilha = (Pilha*) malloc(grafo->arestas * sizeof(Pilha));
+  int* visitados = (int*) malloc(grafo->numero_vertices * sizeof(int));
+  Pilha* pilha = (Pilha*) malloc(grafo->numero_vertices * sizeof(Pilha));
 
-  for (int i = 0; i < grafo->arestas; ++i) {
+  for (int i = 0; i < grafo->numero_vertices; ++i) {
     visitados[i] = 0;
   }
 
@@ -235,15 +232,15 @@ bool eh_conexo(Grafo *grafo) {
     int vertice = pop(pilha);
     topo = vertice;
 
-    for (int i = 0; i < grafo->arestas; ++i) {
-      if (grafo->adjacencia_matriz[vertice][i] == 1 && visitados[i] == 0) {
+    for (int i = 0; i < grafo->numero_vertices; ++i) {
+      if (grafo->matriz_adjacente[vertice][i] == 1 && visitados[i] == 0) {
         push(pilha, i);
         visitados[i] = 1;
       }
     }
   }
 
-  for (int i = 0; i < grafo->arestas; ++i) {
+  for (int i = 0; i < grafo->numero_vertices; ++i) {
     if (visitados[i] == 0) {
       free(visitados);
       free(pilha);
@@ -257,13 +254,13 @@ bool eh_conexo(Grafo *grafo) {
 }
 
 bool isomorfo(Grafo *g1, Grafo *g2) {
-  if (g1->arestas != g2->arestas) {
+  if (g1->numero_vertices != g2->numero_vertices) {
     return false;
   }
 
-  for (int i = 0; i < g1->arestas; i++) {
-    for (int j = 0; j < g1->arestas; j++) {
-      if (g1->adjacencia_matriz[i][j] != g2->adjacencia_matriz[i][j]) {
+  for (int i = 0; i < g1->numero_vertices; i++) {
+    for (int j = 0; j < g1->numero_vertices; j++) {
+      if (g1->matriz_adjacente[i][j] != g2->matriz_adjacente[i][j]) {
         return false;
       }
     }
@@ -289,7 +286,7 @@ Lista* acha_caminho_bfs(Grafo *grafo, const char **origem, const char **destino)
   int indice_origem = -1;
   int indice_destino = -1;
 
-  for (int i = 0; i < grafo->arestas; ++i) {
+  for (int i = 0; i < grafo->numero_vertices; ++i) {
     if (strcmp(grafo->vertices[i].label, origem) == 0) {
       indice_origem = i;
     }
@@ -308,7 +305,7 @@ Lista* acha_caminho_bfs(Grafo *grafo, const char **origem, const char **destino)
   int path_length = 0;
   int path[MAX_VERTICES];
 
-  bfs(grafo->adjacencia_matriz, indice_origem, indice_destino, path, &path_length);
+  bfs(grafo->matriz_adjacente, indice_origem, indice_destino, path, &path_length);
 
   Lista *head, *tail, *aux;
   

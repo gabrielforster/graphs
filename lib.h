@@ -10,7 +10,7 @@ typedef struct {
 // Estrutura do Grafo
 typedef struct {
   Vertice vertices[MAX_VERTICES];
-  int arestas;
+  int numero_vertices;
   int adjacencia_matriz[MAX_VERTICES][MAX_VERTICES];
 } Grafo;
 
@@ -34,7 +34,7 @@ typedef struct fila {
 void inicializar_grafo(Grafo *grafo);
 void adicionar_vertice(Grafo *grafo, const char *label);
 void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino);
-void imprimir_adjacencia_matriz(Grafo *grafo);
+void imprimir_matriz_adjacente(Grafo *grafo);
 void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
 

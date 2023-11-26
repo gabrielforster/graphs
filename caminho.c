@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
   imprimir_vertices(grafo);
   imprimir_arestas(grafo);
 
-  imprimir_adjacencia_matriz(grafo);
+  imprimir_matriz_adjacente(grafo);
 
   Lista* lista = acha_caminho_bfs(grafo, argv[3], argv[4]);
 
