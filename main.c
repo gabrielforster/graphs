@@ -35,10 +35,68 @@ int main(int argc, char *argv[]) {
 
   free(arestas);
 
-  imprimir_vertices(grafo);
   imprimir_arestas(grafo);
 
   imprimir_adjacencia_matriz(grafo);
+  
+  printf("Caminho entre A e C: ");
+  Lista *lista = acha_caminho(grafo, (Vertice) {'A'}, (Vertice) {'C'});
 
+  while (lista != NULL) {
+    printf("%s ", lista->vertice.label);
+    lista = lista->proximo;
+  }
+  printf("\n");
+
+  Vertice origem, destino;
+
+  printf("Deseja saber o caminho entre quais vértices? ");
+  scanf("%s %s", origem.label, destino.label);
+
+  printf("Caminho entre %s e %s usando dfs: ", origem.label, destino.label);
+  Lista *lista = acha_caminho(grafo, origem, destino);
+
+  if (lista == NULL) {
+    printf("Caminho não encontrado\n");
+    return 0;
+  } else {
+    while (lista != NULL) {
+      printf("%s ", lista->vertice.label);
+      lista = lista->proximo;
+    }
+    printf("\n");
+  }
+
+  lista = acha_caminho_bfs(grafo, origem, destino);
+
+  printf("Caminho entre %s e %s usando bfs: ", origem.label, destino.label);
+  if (lista == NULL) {
+    printf("Caminho não encontrado\n");
+    return 0;
+  } else {
+    while (lista != NULL) {
+      printf("%s ", lista->vertice.label);
+      lista = lista->proximo;
+    }
+    printf("\n");
+  }
+
+  lista = acha_caminho_bfs_short(grafo, origem, destino);
+
+  printf("Caminho entre %s e %s usando bfs_short: ", origem.label, destino.label);
+  if (lista == NULL) {
+    printf("Caminho não encontrado\n");
+    return 0;
+  } else {
+    while (lista != NULL) {
+      printf("%s ", lista->vertice.label);
+      lista = lista->proximo;
+    }
+    printf("\n");
+  }
+
+  bool isomorfico = isomorfo(grafo, grafo);
+
+  printf("Grafo é isomórfico a si mesmo? %s\n", isomorfico ? "Sim" : "Não");
   return 0;
 }

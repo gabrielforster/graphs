@@ -134,6 +134,7 @@ bool isomorfo(Grafo *g1, Grafo *g2);
 void imprimir_caminho(Lista *lista);
 Lista* acha_caminho_bfs(Grafo *grafo, const char **origem, const char **destino);
 
+
 void inicializar_grafo(Grafo *grafo) {
   grafo->arestas = 0;
 
@@ -146,6 +147,7 @@ void inicializar_grafo(Grafo *grafo) {
 
 void adicionar_vertice(Grafo *grafo, const char *label) {
   strcpy(grafo->vertices[grafo->arestas].label, label);
+
   grafo->arestas++;
 }
 
@@ -159,6 +161,7 @@ void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino) {
     }
 
     if (strcmp(grafo->vertices[i].label, destino) == 0) {
+
       indice_destino = i;
     }
   }
@@ -182,6 +185,7 @@ void imprimir_adjacencia_matriz(Grafo *grafo) {
 
   for (int i = 0; i < grafo->arestas; ++i) {
     printf("%s\t", grafo->vertices[i].label);
+
     for (int j = 0; j < grafo->arestas; ++j) {
       printf("%d\t", grafo->adjacencia_matriz[i][j]);
     }
@@ -291,6 +295,7 @@ Lista* acha_caminho_bfs(Grafo *grafo, const char **origem, const char **destino)
     }
 
     if (strcmp(grafo->vertices[i].label, destino) == 0) {
+
       indice_destino = i;
     }
   }

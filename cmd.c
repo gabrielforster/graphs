@@ -79,6 +79,7 @@ char** pegar_vertices(const char *input, int *num_elementos) {
   while (token != NULL) {
     strcpy(result[count], token);
     count++;
+
     token = strtok(NULL, ",");
   }
 

@@ -37,6 +37,7 @@ void adicionar_aresta(Grafo *grafo, const char *origem, const char *destino);
 void imprimir_adjacencia_matriz(Grafo *grafo);
 void imprimir_vertices(Grafo *grafo);
 void imprimir_arestas(Grafo *grafo);
+
 bool eh_conexo(Grafo *grafo);
 bool isomorfo(Grafo *g1, Grafo *g2);
 

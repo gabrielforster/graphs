@@ -35,6 +35,7 @@ void montar_grafo(Grafo *grafo, const char *vertices_arg, const char *arestas_ar
   for (int i = 0; i < numElements; ++i)
     adicionar_vertice(grafo, vertices[i]);
 
+
   free(vertices);
 
   int numPares;
@@ -42,6 +43,7 @@ void montar_grafo(Grafo *grafo, const char *vertices_arg, const char *arestas_ar
 
   for (int i = 0; i < numPares; ++i)
     adicionar_aresta(grafo, arestas[i][0], arestas[i][1]);
+
 
   for (int i = 0; i < numPares; ++i)
     free(arestas[i]);
