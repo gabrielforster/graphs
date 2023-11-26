@@ -217,31 +217,31 @@ void imprimir_arestas(Grafo *grafo) {
 }
 
 bool eh_conexo(Grafo *grafo) {
-  int* visitados = (int*) malloc(grafo->numero_vertices * sizeof(int));
+  bool* visitados = (bool*) malloc(grafo->numero_vertices * sizeof(bool));
   Pilha* pilha = (Pilha*) malloc(grafo->numero_vertices * sizeof(Pilha));
 
   for (int i = 0; i < grafo->numero_vertices; ++i) {
-    visitados[i] = 0;
+    visitados[i] = false;
   }
 
   int topo = 0;
   push(pilha, topo);
-  visitados[0] = 1;
+  visitados[0] = true;
 
   while (topo != -1) {
     int vertice = pop(pilha);
     topo = vertice;
 
     for (int i = 0; i < grafo->numero_vertices; ++i) {
-      if (grafo->matriz_adjacente[vertice][i] == 1 && visitados[i] == 0) {
+      if (grafo->matriz_adjacente[vertice][i] == 1 && visitados[i] == false) {
         push(pilha, i);
-        visitados[i] = 1;
+        visitados[i] = true;
       }
     }
   }
 
   for (int i = 0; i < grafo->numero_vertices; ++i) {
-    if (visitados[i] == 0) {
+    if (visitados[i] == false) {
       free(visitados);
       free(pilha);
       return false;
